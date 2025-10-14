@@ -14,7 +14,7 @@ type Author {
 
 type Book {
   author: Author!
-  authorId: String!
+  authorId: Float!
   createdAt: DateTime!
   description: String
   id: ID!
@@ -30,7 +30,7 @@ input CreateAuthorInput {
 }
 
 input CreateBookInput {
-  authorId: String!
+  authorId: Float!
   description: String
   publishedYear: Int!
   title: String!
@@ -57,9 +57,9 @@ type Query {
 }
 
 input UpdateBookInput {
-  authorId: String
+  authorId: Float
   description: String
-  id: String!
+  id: Float!
   publishedYear: Int
   title: String
 }

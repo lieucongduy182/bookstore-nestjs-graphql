@@ -32,7 +32,7 @@ export class BooksResolver {
 
   @Query(() => Book, { name: 'book' })
   findOne(@Args('id') id: string) {
-    return this.booksService.findOne(id);
+    return this.booksService.findOne(+id);
   }
 
   @Mutation(() => Boolean)
@@ -40,7 +40,7 @@ export class BooksResolver {
     @Args('id') id: string,
     @Args('updateBookInput') updateBookInput: UpdateBookInput,
   ) {
-    return this.booksService.update(id, updateBookInput);
+    return this.booksService.update(+id, updateBookInput);
   }
 
   @Mutation(() => Boolean)
