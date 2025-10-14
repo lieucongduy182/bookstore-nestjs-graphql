@@ -1,59 +1,58 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Book } from './entities/book.entity';
 import { CreateBookInput } from './dto/create-book.input';
-import { v4 as uuidv4 } from 'uuid';
 import { UpdateBookInput } from './dto/update-book.input';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class BooksService {
-  private books: Book[] = [];
+  constructor(
+    @InjectRepository(Book) private readonly bookRepository: Repository<Book>,
+  ) {}
 
-  create(createBookInput: CreateBookInput): Book {
-    const book: Book = {
-      id: uuidv4(),
-      ...createBookInput,
-      authorId: createBookInput.authorId,
-      publishedYear: createBookInput.publishedYear,
-    };
-
-    this.books.push(book);
-    return book;
+  async create(createBookInput: CreateBookInput): Promise<Book> {
+    const book = this.bookRepository.create(createBookInput);
+    return await this.bookRepository.save(book);
   }
 
-  findAll(): Book[] {
-    return this.books;
+  async findAll(): Promise<Book[]> {
+    return await this.bookRepository.find({ relations: ['author'] });
   }
 
-  findOne(id: string): Book {
-    const book = this.books.find((b) => b.id === id);
+  async findOne(id: number): Promise<Book> {
+    const book = await this.bookRepository.findOne({
+      where: { id },
+      relations: ['author'],
+    });
     if (!book) {
       throw new NotFoundException(`Book with ID ${id} not found`);
     }
     return book;
   }
 
-  findByAuthorId(authorId: string): Book[] {
-    return this.books.filter((b) => b.authorId === authorId);
+  async findByAuthorId(authorId: number): Promise<Book[]> {
+    return await this.bookRepository.find({
+      where: { authorId },
+      relations: ['author'],
+    });
   }
 
-  update(id: string, updateBookInput: UpdateBookInput): Book {
-    const bookIndex = this.books.findIndex((b) => b.id === id);
-    if (bookIndex === -1) {
+  async update(id: number, updateBookInput: UpdateBookInput): Promise<Book> {
+    const book = await this.bookRepository.findOne({ where: { id } });
+    if (!book) {
       throw new NotFoundException(`Book with ID ${id} not found`);
     }
-    this.books[bookIndex] = {
-      ...this.books[bookIndex],
-      ...updateBookInput,
-    };
-    return this.books[bookIndex];
+
+    this.bookRepository.merge(book, updateBookInput);
+    return await this.bookRepository.save(book);
   }
 
-  remove(id: string): boolean {
-    const bookIndex = this.books.findIndex((b) => b.id === id);
-    if (bookIndex === -1) {
+  async remove(id: string): Promise<boolean> {
+    const result = await this.bookRepository.delete(id);
+    if (result.affected === 0) {
       throw new NotFoundException(`Book with ID ${id} not found`);
     }
-    this.books.splice(bookIndex, 1);
     return true;
   }
 }

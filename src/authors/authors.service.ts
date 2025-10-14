@@ -2,51 +2,55 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { Author } from './entities/author.entity';
 import { CreateAuthorInput } from './dto/create-author.input';
 import { UpdateAuthorInput } from './dto/update-author.input';
-import { v4 as uuidv4 } from 'uuid';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class AuthorsService {
-  private authors: Author[] = [];
+  constructor(
+    @InjectRepository(Author)
+    private readonly authorRepository: Repository<Author>,
+  ) {}
 
-  create(createAuthorInput: CreateAuthorInput): Author {
-    const author: Author = {
-      id: uuidv4(),
-      ...createAuthorInput,
-    };
-    this.authors.push(author);
-    return author;
+  async create(createAuthorInput: CreateAuthorInput): Promise<Author> {
+    const author = this.authorRepository.create(createAuthorInput);
+    return await this.authorRepository.save(author);
   }
 
-  findAll(): Author[] {
-    return this.authors;
+  async findAll(): Promise<Author[]> {
+    return await this.authorRepository.find({
+      relations: ['books'],
+    });
   }
 
-  findOne(id: string): Author {
-    const author = this.authors.find((a) => a.id === id);
+  async findOne(id: number): Promise<Author> {
+    const author = await this.authorRepository.findOne({
+      where: { id },
+      relations: ['books'],
+    });
+
     if (!author) {
       throw new NotFoundException(`Author with ID ${id} not found`);
     }
+
     return author;
   }
 
-  update(id: string, updateAuthorInput: UpdateAuthorInput): Author {
-    const authorIndex = this.authors.findIndex((a) => a.id === id);
-    if (authorIndex === -1) {
-      throw new NotFoundException(`Author with ID ${id} not found`);
-    }
-    this.authors[authorIndex] = {
-      ...this.authors[authorIndex],
-      ...updateAuthorInput,
-    };
-    return this.authors[authorIndex];
+  async update(
+    id: number,
+    updateAuthorInput: UpdateAuthorInput,
+  ): Promise<Author> {
+    const author = await this.findOne(id);
+    this.authorRepository.merge(author, updateAuthorInput);
+    return await this.authorRepository.save(author);
   }
 
-  remove(id: string): boolean {
-    const authorIndex = this.authors.findIndex((a) => a.id === id);
-    if (authorIndex === -1) {
+  async remove(id: string): Promise<boolean> {
+    const result = await this.authorRepository.delete(id);
+    if (result.affected === 0) {
       throw new NotFoundException(`Author with ID ${id} not found`);
     }
-    this.authors.splice(authorIndex, 1);
+
     return true;
   }
 }

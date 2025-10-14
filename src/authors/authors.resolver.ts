@@ -33,7 +33,7 @@ export class AuthorsResolver {
 
   @Query(() => Author, { name: 'author' })
   findOne(@Args('id') id: string) {
-    return this.authorsService.findOne(id);
+    return this.authorsService.findOne(+id);
   }
 
   @Mutation(() => Boolean)

@@ -9,7 +9,7 @@ export class CreateBookInput {
 
   @Field()
   @IsNotEmpty()
-  authorId: string;
+  authorId: number;
 
   @Field(() => Int)
   @IsInt()

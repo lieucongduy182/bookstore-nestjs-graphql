@@ -4,5 +4,5 @@ import { CreateAuthorInput } from './create-author.input';
 @InputType()
 export class UpdateAuthorInput extends PartialType(CreateAuthorInput) {
   @Field()
-  id: string;
+  id: number;
 }
