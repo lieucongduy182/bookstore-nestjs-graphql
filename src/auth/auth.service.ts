@@ -46,7 +46,7 @@ export class AuthService {
 
     const accessToken = this.generateToken(user);
 
-    return { accessToken };
+    return { accessToken, user };
   }
 
   async validateUser(userId: number) {

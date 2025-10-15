@@ -11,6 +11,9 @@ import { Author } from './entities/author.entity';
 import { CreateAuthorInput } from './dto/create-author.input';
 import { BooksService } from 'src/books/books.service';
 import { Book } from 'src/books/entities/book.entity';
+import { UseGuards } from '@nestjs/common';
+import { GqlAuthGuard } from 'src/auth/guards/gql-auth.guard';
+import { UpdateAuthorInput } from './dto/update-author.input';
 
 @Resolver(() => Author)
 export class AuthorsResolver {
@@ -20,6 +23,7 @@ export class AuthorsResolver {
   ) {}
 
   @Mutation(() => Author)
+  @UseGuards(GqlAuthGuard)
   createAuthor(
     @Args('createAuthorInput') createAuthorInput: CreateAuthorInput,
   ) {
@@ -36,7 +40,17 @@ export class AuthorsResolver {
     return this.authorsService.findOne(+id);
   }
 
+  @Mutation(() => Author)
+  @UseGuards(GqlAuthGuard)
+  updateAuthor(
+    @Args('id') id: string,
+    @Args('updateAuthorInput') updateAuthorInput: UpdateAuthorInput,
+  ) {
+    return this.authorsService.update(+id, updateAuthorInput);
+  }
+
   @Mutation(() => Boolean)
+  @UseGuards(GqlAuthGuard)
   removeAuthor(@Args('id') id: string) {
     return this.authorsService.remove(id);
   }
