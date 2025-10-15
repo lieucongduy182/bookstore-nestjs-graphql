@@ -14,6 +14,8 @@ import { Book } from 'src/books/entities/book.entity';
 import { UseGuards } from '@nestjs/common';
 import { GqlAuthGuard } from 'src/auth/guards/gql-auth.guard';
 import { UpdateAuthorInput } from './dto/update-author.input';
+import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
+import { User } from 'src/users/entities/user.entity';
 
 @Resolver(() => Author)
 export class AuthorsResolver {
@@ -26,6 +28,7 @@ export class AuthorsResolver {
   @UseGuards(GqlAuthGuard)
   createAuthor(
     @Args('createAuthorInput') createAuthorInput: CreateAuthorInput,
+    @CurrentUser() user: User,
   ) {
     return this.authorsService.create(createAuthorInput);
   }

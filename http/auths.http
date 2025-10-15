@@ -26,3 +26,13 @@ Content-Type: application/json
     }
   }
 }
+
+### Get ME
+@accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiZHV5bGNAZXhhbXBsZS5jb20iLCJyb2xlIjoidXNlciIsImlhdCI6MTc2MDUxNTI4OSwiZXhwIjoxNzYwNjAxNjg5fQ.uWHIuP1tIRivu2flE6Cw9RsP0WncYURblpV9A36hy0M
+POST http://localhost:3000/graphql HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "query": "query { me { id, email, username, role } }"
+}

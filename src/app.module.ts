@@ -11,10 +11,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
 import { AuthResolver } from './auth/auth.resolver';
 import { AuthModule } from './auth/auth.module';
+import { LoggerModule } from './common/logger/logger.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    LoggerModule,
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

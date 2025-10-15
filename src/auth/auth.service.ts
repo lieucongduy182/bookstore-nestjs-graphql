@@ -1,37 +1,51 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { UsersModule } from 'src/users/users.module';
 import { UsersService } from 'src/users/users.service';
 import { SignupInput } from './dto/signup.input';
 import { User } from 'src/users/entities/user.entity';
 import { LoginInput } from './dto/login.input';
+import { CustomLoggerService } from 'src/common/logger/logger.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userService: UsersService,
     private readonly jwtService: JwtService,
+    private readonly logger: CustomLoggerService,
   ) {}
 
   async signup(signupInput: SignupInput) {
-    const user = await this.userService.create({
-      email: signupInput.email,
-      username: signupInput.username,
-      password: signupInput.password,
-    });
+    this.logger.log(`Signing up user with email: ${signupInput.email}`);
 
-    const accessToken = this.generateToken(user);
+    try {
+      const user = await this.userService.create({
+        email: signupInput.email,
+        username: signupInput.username,
+        password: signupInput.password,
+      });
 
-    return {
-      accessToken,
-      user,
-    };
+      const accessToken = this.generateToken(user);
+
+      return {
+        accessToken,
+        user,
+      };
+    } catch (error) {
+      this.logger.error(
+        `Error during signup for email: ${signupInput.email}`,
+        error.stack,
+      );
+      throw error;
+    }
   }
 
   async login(loginInput: LoginInput) {
     const user = await this.userService.findByEmail(loginInput.email);
 
     if (!user) {
+      this.logger.warn(
+        `Login failed: User not found for email ${loginInput.email}`,
+      );
       throw new UnauthorizedException('Invalid credentials');
     }
 
@@ -41,6 +55,9 @@ export class AuthService {
     );
 
     if (!isPasswordValid) {
+      this.logger.warn(
+        `Login failed: Invalid password for email ${loginInput.email}`,
+      );
       throw new UnauthorizedException('Invalid credentials');
     }
 

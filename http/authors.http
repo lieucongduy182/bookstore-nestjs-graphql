@@ -1,3 +1,5 @@
+@accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiZHV5bGNAZXhhbXBsZS5jb20iLCJyb2xlIjoidXNlciIsImlhdCI6MTc2MDUxNTQxOSwiZXhwIjoxNzYwNjAxODE5fQ.CQxsSZIc6mQAHPCMd8b-MTthaYiqiQTKodPmvtVb6EE
+
 ### Authors
 POST http://localhost:3000/graphql HTTP/1.1
 Content-Type: application/json
@@ -20,14 +22,15 @@ Content-Type: application/json
 ### Create Author
 POST http://localhost:3000/graphql HTTP/1.1
 Content-Type: application/json
+Authorization: Bearer {{accessToken}}
 
 {
   "query": "mutation CreateAuthor($input: CreateAuthorInput!) { createAuthor(createAuthorInput: $input ) { id name email bio } }",
   "variables": {
     "input": {
-      "name": "Cris",
-      "email": "Cris.doe@example.com",
-      "bio": "An emerging author in tech literature."
+      "name": "CrisDuyLC",
+      "email": "CrisDuyLC.doe@example.com",
+      "bio": "Amazing NestJS"
     }
   }
 }
