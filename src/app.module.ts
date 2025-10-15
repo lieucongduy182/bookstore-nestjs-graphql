@@ -8,6 +8,9 @@ import { AuthorsModule } from './authors/authors.module';
 import { BooksModule } from './books/books.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { UsersModule } from './users/users.module';
+import { AuthResolver } from './auth/auth.resolver';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -23,7 +26,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
         password: configService.get('POSTGRES_PASSWORD'),
         database: configService.get('POSTGRES_DB'),
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
-        synchronize: true, // Set to false in production
+        synchronize: true,
       }),
     }),
     GraphQLModule.forRoot({
@@ -35,8 +38,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     }),
     AuthorsModule,
     BooksModule,
+    UsersModule,
+    AuthModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, AuthResolver],
 })
 export class AppModule {}
