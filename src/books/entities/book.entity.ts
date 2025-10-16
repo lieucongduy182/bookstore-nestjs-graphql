@@ -28,7 +28,7 @@ export class Book {
     onDelete: 'CASCADE',
   })
   @Field(() => Author)
-  author?: Author;
+  author?: typeof Author;
 
   @Column()
   @Field(() => Int)

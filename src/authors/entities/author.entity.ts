@@ -29,7 +29,7 @@ export class Author {
 
   @OneToMany(() => Book, (book) => book.author)
   @Field(() => [Book], { nullable: 'itemsAndList' })
-  books?: Book[];
+  books?: typeof Book[];
 
   @CreateDateColumn()
   @Field()
